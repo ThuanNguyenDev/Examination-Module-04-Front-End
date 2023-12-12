@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <h2>ADD EMPLOYEE</h2>
+
+  <a href="./showEmployee.html"> BACK</a>
+  <br>
+  <br>
+  <br>
+
+  <label for="code">
+    Employee Code
+    <br><input type="text" id="code" /><br>
+    <br>
+
+  
+  <label for="name">
+    Tên
+    <br><input type="text" id="name" /><br>
+    <br>
+    
+  </label><br>
+  <label for="age">
+    Age
+    <br><input type="number" id="age" /><br>
+  </label><br>
+
+
+<label for="salary">
+  Salary
+  <br><input type="number" id="salary" /><br>
+</label><br>
+<br>
+<br>
+
+
+
+<label>BRANCH PLAYLIST</label><br>
+<select class="playlist" id="branch" name="branch">
+    <option value="1">Branch A</option>
+    <option value="2">Branch B</option>
+    <option value="3">Branch C</option>
+    <option value="4">Branch D</option>
+    <option value="5">Branch E</option>
+</select><br><br>
+<br>
+<br>
+   
+  <button type="button" onclick="addEmployee()">Create</button>
+  <button type="reset">Cancle</button>
+
+  <script>
+function addEmployee() {
+    let employee = {};
+    employee.code = $('#code').val();
+    employee.name = $('#name').val();
+    employee.age = $('#age').val();
+    employee.salary = $('#salary').val();
+    employee.branchId = $('#branch').val(); 
+
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/api/add",
+        data: JSON.stringify(employee),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (result) {
+            alert("Employee added successfully.");
+            console.log(employee);
+            window.location.href = "http://127.0.0.1:5500/showEmployee.html";
+        },
+        error: function () {
+            alert("Failed to add employee.");
+        }
+    });
+}
+
+
+  </script>
+</body>
+
+</html>

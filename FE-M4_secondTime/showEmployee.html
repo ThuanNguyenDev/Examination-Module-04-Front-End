@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <title>Document</title>
+
+    <style>
+        /* CSS cho bảng */
+        table {
+            width: 100%;
+            /* Đảm bảo bảng chiếm toàn bộ chiều rộng của phần tử cha */
+            border-collapse: collapse;
+            /* Gộp các đường viền */
+        }
+
+        /* CSS cho các cột */
+        table th {
+            text-align: center;
+            /* Canh giữa tiêu đề cột */
+            background-color: #f2f2f2;
+            /* Màu nền cho tiêu đề cột */
+            padding: 10px;
+            /* Khoảng cách nội dung với đường viền */
+            border: 1px solid #ddd;
+            /* Đường viền */
+        }
+
+        /* CSS cho các hàng trong bảng */
+        table td {
+            text-align: center;
+            /* Canh giữa nội dung hàng */
+            padding: 10px;
+            /* Khoảng cách nội dung với đường viền */
+            border: 1px solid #ddd;
+            /* Đường viền */
+        }
+
+        /* CSS cho nút Xóa và Sửa */
+        .delete-button,
+        .edit-button {
+            background-color: #f44336;
+            /* Màu nền nút Xóa */
+            color: white;
+            /* Màu chữ nút Xóa */
+            padding: 5px 10px;
+            /* Khoảng cách nút Xóa với nội dung */
+            border: none;
+            /* Loại bỏ đường viền */
+            cursor: pointer;
+            /* Hiển thị biểu tượng con trỏ khi di chuột vào */
+            margin-right: 5px;
+            /* Khoảng cách giữa các nút */
+        }
+
+        /* CSS cho nút Sửa */
+        .edit-button {
+            background-color: #4CAF50;
+            /* Màu nền nút Sửa */
+        }
+
+        /* CSS cho nút Xóa khi di chuột vào */
+        .delete-button:hover {
+            background-color: #d32f2f;
+            /* Màu nền khi hover vào nút Xóa */
+        }
+
+        /* CSS cho nút Sửa khi di chuột vào */
+        .edit-button:hover {
+            background-color: #388e3c;
+            /* Màu nền khi hover vào nút Sửa */
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <h2 style="text-align: center;">EMPLOYEE LIST</h2>
+
+    <a href="./addEmployee.html"> ADD EMPLOYEE</a>
+    <br>
+    <br>
+    
+
+
+
+    <div id="videoDetails"></div>
+
+   
+<!-- <button class="btn btn-primary view-details-button" data-toggle="modal" data-target="#employeeModal${employee.id}">
+    Xem chi tiết
+</button> -->
+
+
+<!-- <div class="modal fade" id="employeeModal${employee.id}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Thông tin chi tiết nhân viên</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>ID:</strong> ${employee.id}</p>
+                <p><strong>Tên:</strong> ${employee.name}</p>
+                <p><strong>Tuổi:</strong> ${employee.age}</p>
+                <p><strong>Lương:</strong> ${employee.salary}</p>
+                <p><strong>PHÒNG BAN:</strong> ${employee.branchName}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+
+    <script>
+
+$(document).ready(function () {
+    $.ajax({
+        url: "http://localhost:8080/api/show",
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            var tableHtml = $('#videoDetails');
+
+        
+            if (data.data) {
+                var employees = data.data.content; 
+
+                tableHtml.append(`
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Employee Code</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Salary</th>
+                                <th>Branch</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `);
+
+                employees.forEach(function (employee) {
+                    tableHtml.find('tbody').append(`
+                        <tr>
+                            <td>${employee.code}</td>
+                            <td>${employee.name}</td>
+                            <td>${employee.age}</td>
+                            <td>${employee.salary}</td>
+                            <td>${employee.branchName}</td>
+                            <td>
+                                <button class="delete-button" onclick="confirmDelete(${employee.id})">Xóa</button>
+                                <button class="delete-button" onclick="confirmEdit(${employee.id})">Sửa</button>
+                                <button class="view-details-button" onclick="getEmployeeDetails(${employee.id})">Xem chi tiết</button>
+
+                            </td>
+                        </tr>
+                    `);
+                });
+
+                tableHtml.append('</tbody></table>');
+
+               
+                $('.delete-button').click(function () {
+                    var employeeId = $(this).data('employee-id');
+                    deleteEmployee(employeeId);
+                });
+
+              
+                $('.edit-button').click(function () {
+                    var employeeId = $(this).data('employee-id');
+                    editEmployee(employeeId);
+                });
+            } else {
+                console.error('Failed to fetch employee details.');
+            }
+        },
+        error: function () {
+            console.error('Failed to fetch employee details.');
+        }
+    });
+});
+
+
+function confirmDelete(employeeId) {
+    if (confirm('Bạn có chắc chắn muốn xóa nhân viên này không?')) {
+     
+        deleteEmployee(employeeId);
+    } else {
+       
+        console.log('Xóa đã được hủy.');
+    }
+}
+
+
+function deleteEmployee(employeeId) {
+    $.ajax({
+        url: 'http://localhost:8080/api/delete/' + employeeId, 
+        method: 'DELETE',
+        success: function () {
+         
+            $('#videoDetails').find('[data-employee-id="' + employeeId + '"]').closest('tr').remove();
+            window.location.reload();
+        },
+        error: function () {
+            console.error('Failed to delete employee with ID ' + employeeId);
+        }
+    });
+}
+
+function getEmployeeDetails(employeeId) {
+    $.ajax({
+        url: 'http://localhost:8080/api/' + employeeId,
+        method: 'GET',
+        dataType: 'json',
+        success: function (data) {
+           
+            alert('Thông tin chi tiết của nhân viên có ID ' + data.id + '\nTên: ' + data.name + '\nTuổi: ' + data.age + '\nLương: ' + data.salary);
+        },
+        error: function () {
+            console.error('Không thể lấy thông tin chi tiết của nhân viên.');
+        }
+    });
+}
+
+
+
+
+    </script>
+
+</body>
+
+</html>
